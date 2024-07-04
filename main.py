@@ -6,9 +6,9 @@ import pandas as pd
 import numpy as np
 
 
-appi = FastAPI()
+app = FastAPI()
 
-@appi.get("/")
+@app.get("/")
 def read_root():
     return {"message": "Bienvenido, a mi api sobre peliculas"}
 
@@ -24,7 +24,7 @@ def consulta_datos_directores():
     data_directores=pd.read_csv('datasets/directores_limpio.csv',encoding='UTF-8',sep=',')
     return data_directores
 
-@appi.get("peliculas_por_mes/{mes}")
+@app.get("peliculas_por_mes/{mes}")
 def cantidad_filmaciones_por_mes(mes:str):
     """_summary_
         Consulta las paliculas de un determinado mes
@@ -64,7 +64,7 @@ def cantidad_filmaciones_por_mes(mes:str):
         
     return respuesta
 
-@appi.get("/peliculas_por_dia/{dia}")
+@app.get("/peliculas_por_dia/{dia}")
 def cantidad_filmaciones_dia(dia:str=''):
     """Método que consulta las paliculas por dia
 
@@ -101,7 +101,7 @@ def cantidad_filmaciones_dia(dia:str=''):
         
     return respuesta
 
-@appi.get("/score_por_titulo/{titulo}")
+@app.get("/score_por_titulo/{titulo}")
 def score_titulo(titulo:str=''):
     respuesta=''
     try:
@@ -123,7 +123,7 @@ def score_titulo(titulo:str=''):
         
     return respuesta
 
-@appi.get("/votos_por_titulo/{titulo}")
+@app.get("/votos_por_titulo/{titulo}")
 def votos_titulo( titulo:str='' ):
     respuesta=''
     cantidad_votos=0
@@ -158,7 +158,7 @@ def votos_titulo( titulo:str='' ):
 
     return respuesta
 
-@appi.get("/actor/{nombre}")
+@app.get("/actor/{nombre}")
 def get_actor(nombre:str=''):
 # Consulta de agregación
     conteo=0
@@ -205,7 +205,7 @@ def get_actor(nombre:str=''):
       
     return respuesta    
     
-@appi.get("/director/{nombre}")
+@app.get("/director/{nombre}")
 def get_director(nombre:str=''):
 # Consulta de agregación
     conteo=0
