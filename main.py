@@ -7,7 +7,7 @@ import numpy as np
 
 
 app = FastAPI()
-
+#uvicorn main:app --reload
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido, a mi api sobre peliculas"}
@@ -24,7 +24,7 @@ def consulta_datos_directores():
     data_directores=pd.read_csv('datasets/directores_limpio.csv',encoding='UTF-8',sep=',')
     return data_directores
 
-@app.get("peliculas_por_mes/{mes}")
+@app.get("/peliculas_por_mes")
 def cantidad_filmaciones_por_mes(mes:str):
     """_summary_
         Consulta las paliculas de un determinado mes
