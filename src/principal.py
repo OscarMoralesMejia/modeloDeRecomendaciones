@@ -1,10 +1,22 @@
 from fastapi import FastAPI,HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 import pandas as pd
 import numpy as np
 
+
+
 appi = FastAPI()
+
+# Configurar CORS
+appi.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://modeloderecomendaciones.onrender.com/", "https://modeloderecomendaciones.onrender.com/:21000","https://modeloderecomendaciones.onrender.com/docs"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #uvicorn principal:appi --reload
 @appi.get("/")
@@ -24,7 +36,7 @@ def consulta_datos_directores():
     return data_directores
 
 @appi.get("peliculas_por_mes/{mes}")
-def cantidad_filmaciones_mes(mes:str):
+def cantidad_filmaciones_por_mes(mes:str):
     """_summary_
         Consulta las paliculas de un determinado mes
     Args:
