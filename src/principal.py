@@ -12,15 +12,15 @@ def read_root():
     return {"message": "Bienvenido, a mi api sobre peliculas"}
 
 def consulta_datos():
-    data_movies=pd.read_csv('../datasets/movies_limpio.csv',encoding='UTF-8',sep=',')
+    data_movies=pd.read_csv('datasets/movies_limpio.csv',encoding='UTF-8',sep=',')
     return data_movies
 
 def consulta_datos_actores():
-    data_actores=pd.read_csv('../datasets/actores_limpio.csv',encoding='UTF-8',sep=',')
+    data_actores=pd.read_csv('datasets/actores_limpio.csv',encoding='UTF-8',sep=',')
     return data_actores
 
 def consulta_datos_directores():
-    data_directores=pd.read_csv('../datasets/directores_limpio.csv',encoding='UTF-8',sep=',')
+    data_directores=pd.read_csv('datasets/directores_limpio.csv',encoding='UTF-8',sep=',')
     return data_directores
 
 @appi.get("peliculas_por_mes/{mes}")
