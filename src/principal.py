@@ -24,7 +24,7 @@ def consulta_datos_directores():
     return data_directores
 
 @appi.get("peliculas_por_mes/{mes}")
-def cantidad_filmaciones_mes(mes:str=''):
+def cantidad_filmaciones_mes(mes:str):
     """_summary_
         Consulta las paliculas de un determinado mes
     Args:
