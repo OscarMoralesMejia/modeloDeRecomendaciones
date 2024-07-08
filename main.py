@@ -272,7 +272,6 @@ def get_recomendacion(titulo:str):
 
     movies=pd.read_csv("datasets/movies_limpio.csv",sep=',',encoding='UTF-8')
     
-    #titulos=movies.loc[:,movies['id_orig','original_title']]
     titulos=movies['original_title']
     
     df_titulos=pd.DataFrame(titulos)
@@ -283,19 +282,16 @@ def get_recomendacion(titulo:str):
     X['return']=X['return'].fillna(0)
     X.replace([np.inf, -np.inf], np.nan, inplace=True)
     X['return']=X['return'].fillna(0)
-    ##print(X.isna().sum())
-    print(X['return'].max())
+
     model = NearestNeighbors(metric='cosine', algorithm='auto')#'brute')
     model.fit(X)
-    #movie_index=titulo(titulo,movies)
+
     movie_index = movies.loc[movies['original_title'].apply(lambda x: x.lower()) == titulo.lower()]
-    print("movie_index::",movie_index)
-    print(movies.columns)
-    
+       
     if movie_index.empty:
         indice=-1
     else :
-        indice=movie_index['id_orig'].values[0]
+        indice=movie_index['id_orig'].index[0]
     
     distances, indices = model.kneighbors(X.iloc[indice, :].values.reshape(1, -1), n_neighbors=6)
       
@@ -308,7 +304,6 @@ def get_recomendacion(titulo:str):
         }
         recomendaciones.append(recomendacion)
 
-    # Convertir la lista de recomendaciones a un JSON
-    mensaje_json = recomendaciones#json.dumps(recomendaciones)#, ensure_ascii=False, indent=4)
+    mensaje_json = recomendaciones
         
     return mensaje_json
