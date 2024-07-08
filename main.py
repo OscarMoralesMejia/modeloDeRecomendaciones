@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime
 import pandas as pd
 import numpy as np
-
 import json
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -32,7 +31,7 @@ def consulta_datos_directores():
 @app.get("/peliculas_por_mes")
 def cantidad_filmaciones_por_mes(mes:str):
     """_summary_
-        Consulta las paliculas de un determinado mes
+        Consulta el total de las peliculas de un determinado mes
     Args:
         mes (str, optional): Indica un mes en idioma español. Defaults to ''.
 
@@ -85,19 +84,18 @@ def cantidad_filmaciones_dia(dia:str=''):
             return "Proporciones un dia de la semana en Español"
         dias_semana={'lunes':0,'martes':1,'miercoles':2,'jueves':3,'viernes':4,'sabado':5,'domingo':6}
         dia_numero = dias_semana[dia.lower()]
-        print(dia_numero)
+        
         #consulta los datos de las peliculas
         data_movies=consulta_datos()
         #Extraer el mes de la columna
         data_movies['release_date'] = pd.to_datetime(data_movies['release_date'], errors='coerce')
-        
         data_movies['dia_semana_num'] = data_movies['release_date'].dt.weekday
         
         # Filtrar los registros que correspondan al mes indicado
         registros_filtrados = data_movies[data_movies['dia_semana_num'] == dia_numero]
         # Contar los registros filtrados
         num_observaciones = registros_filtrados.shape[0]
-        
+        #Armado de respuesta
         respuesta="La cantidad de peliculas estrenadas en el dia"
         partes = [respuesta, dia.lower(), "son",str(num_observaciones)]
         respuesta = " ".join(partes)
@@ -108,6 +106,14 @@ def cantidad_filmaciones_dia(dia:str=''):
 
 @app.get("/score_por_titulo/{titulo}")
 def score_titulo(titulo:str=''):
+    """_summary_
+        Esta función busca el año de estreno de la pelicula y su score
+    Args:
+        titulo (str, optional): Nombre de la Pelicula a buscar en español
+
+    Returns:
+        Regresa una cadena con el titulo de la pelicula su año de estreno y su score
+    """
     respuesta=''
     try:
         if titulo=='':
@@ -130,6 +136,17 @@ def score_titulo(titulo:str=''):
 
 @app.get("/votos_por_titulo/{titulo}")
 def votos_titulo( titulo:str='' ):
+    """_summary_
+        Esta función busca la cantidad de votos y el valor promedio de las votaciones.
+        
+    Args:
+        titulo (str, optional): Nombre de la Pelicula a buscar en español
+
+    Returns:
+        Si la pelicula no cuenta con una puntuación mayor a 2000 puntos se regresa un mensaje de que 
+        la pelicula no cuenta con al menos 2000 valoraciones de lo contrario regresa una cadena con el nombre de la pelicula 
+        las valoraciones y el promedio
+    """
     respuesta=''
     cantidad_votos=0
     promedio_votaciones=0
@@ -139,12 +156,11 @@ def votos_titulo( titulo:str='' ):
         data_movies=consulta_datos()
 
         pelicula = data_movies[data_movies['original_title'].str.lower()==titulo.lower()]
-        #print(type(pelicula)) 
+         
         if pelicula.empty:
              return "pelicula no encontrada"
          
         if not pelicula.empty:
-        # Obtener el valor de la columna 'vote_count' de la primera (y única) fila resultante
             cantidad_votos = pelicula['vote_count'].values[0]
             promedio_votaciones = str(pelicula['vote_average'].values[0])
         
@@ -165,17 +181,22 @@ def votos_titulo( titulo:str='' ):
 
 @app.get("/actor/{nombre}")
 def get_actor(nombre:str=''):
-# Consulta de agregación
+    """_summary_
+    Esta función busca la cantidad de peliculas en las que ha participado el actor y el promedio de retorno
+
+    Args:
+        nombre (str, optional): Nombre del actor
+
+    Returns:
+        Regresa una cadena con el nombre del actor, el número de peliculas en las que ha participado, y el retorno
+        y promedio de retorno que ha generado
+    """
     conteo=0
     respuesta=''
     try:       
         data_movies=consulta_datos()
-        #print(data_movies)
         data_actores=consulta_datos_actores()
-        #print(data_actores)
         df_join_interno = pd.merge(data_movies, data_actores, left_on='id_orig',right_on='id', how='inner')
-        #print(df_join_interno.columns)
-        #print(df_join_interno.columns)
         
         conteo_peliculas = df_join_interno.groupby('cast_name')['original_title'].count().reset_index()
         conteo= conteo_peliculas.loc[conteo_peliculas['cast_name']==nombre]
@@ -186,22 +207,19 @@ def get_actor(nombre:str=''):
             suma_retorno = df_join_interno.groupby('cast_name')['return'].sum().reset_index()
             retorno=suma_retorno.loc[suma_retorno['cast_name']==nombre]
             num_retorno=retorno['return'].values[0]
-            #print("suma:",str(suma_retorno))
-            
+                        
             num_promedio =0
             promedio_retorno = df_join_interno.groupby('cast_name')['return'].mean().reset_index()
-            #print("retorno:",promedio_retorno)
+            
             promedio=promedio_retorno.loc[promedio_retorno['cast_name']==nombre]
             num_promedio=promedio['return'].values[0]
             
-            #conteo_peliculas.columns = ['cast_name', 'conteo_peliculas','suma_retorno']
             parte1="El actor"
             parte2="ha participado de"
             parte3="cantidad de filmaciones, el mismo ha conseguido un retorno de"
             parte4="con un promedio de"
             parte5="por filmacion"
             partes=[parte1,nombre,parte2,str(num_conteo),parte3,str(num_retorno),parte4,str(num_promedio),parte5]
-            #El actor X ha participado de X cantidad de filmaciones, el mismo ha conseguido un retorno de X con un promedio de X por filmación
             respuesta = " ".join(partes)
         else:
             return "El actor no esta en mi base de datos"
@@ -212,48 +230,40 @@ def get_actor(nombre:str=''):
     
 @app.get("/director/{nombre}")
 def get_director(nombre:str=''):
-# Consulta de agregación
+    """_summary_
+        Busca el retorno que ha tenido como director y las peliculas en las que ha dirigido 
+    Args:
+        nombre (str, optional): Nombre del director
+
+    Returns:
+        Una lista de peliculas con el año de estreno retorno individual, costo y ganancia de la misma
+    """
     conteo=0
     respuesta=''
     try:       
         data_movies=consulta_datos()
-        #print(data_movies)
         data_directores=consulta_datos_directores()
-        #print(data_actores)
         df_join_interno = pd.merge(data_movies, data_directores, left_on='id_orig',right_on='id', how='inner')
-        #print(df_join_interno.columns)
+        
         df_directores = df_join_interno[df_join_interno['crew_job'].str.lower() == 'director']
-        #print(df_directores)
+        
         conteo_peliculas = df_directores.groupby('crew_name')['original_title'].count().reset_index()
         conteo= conteo_peliculas.loc[conteo_peliculas['crew_name']==nombre]
-        #print(conteo)
         
         if not conteo.empty :
             num_conteo=conteo['original_title'].values[0]
-            print(num_conteo)
-            
-            # num_retorno=0
-            # suma_retorno = df_join_interno.groupby('crew_name')['return'].sum().reset_index()
-            # retorno=suma_retorno.loc[suma_retorno['crew_name']==nombre]
-            # num_retorno=retorno['return'].values[0]
-            #print("suma:",str(suma_retorno))
             
             num_promedio =0
             promedio_retorno = df_directores.groupby('crew_name')['return'].mean().reset_index()
-            print("retorno:",promedio_retorno)
+            
             promedio=promedio_retorno.loc[promedio_retorno['crew_name']==nombre]
             if not promedio.empty:
                 num_promedio=promedio['return'].values[0]
                 if pd.isna(num_promedio):
                     num_promedio = 0
                 
-                print("numero promedio",num_promedio)
                 pelis=df_directores.loc[df_directores['crew_name']==nombre]
-                print("pelis",pelis)
                 peliculas=pelis.loc[:,['original_title','release_date','return','budget','revenue']]
-                #df_directores_final=df_directores.loc[:,['id','crew_department','crew_id','crew_job','crew_name','budget','revenue']]
-                print(peliculas) #, np.inf, -np.inf
-                print(type(peliculas['return']))
                 peliculas['return'].replace([np.nan], 0, inplace=True)
                 peliculas['budget'].replace([np.nan], 0, inplace=True)
                 peliculas['revenue'].replace([np.nan], 0, inplace=True)
@@ -283,7 +293,7 @@ def get_recomendacion(titulo:str):
     X.replace([np.inf, -np.inf], np.nan, inplace=True)
     X['return']=X['return'].fillna(0)
 
-    model = NearestNeighbors(metric='cosine', algorithm='auto')#'brute')
+    model = NearestNeighbors(metric='cosine', algorithm='auto')
     model.fit(X)
 
     movie_index = movies.loc[movies['original_title'].apply(lambda x: x.lower()) == titulo.lower()]
