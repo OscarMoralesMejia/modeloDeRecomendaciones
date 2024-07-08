@@ -5,6 +5,11 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
+import json
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import NearestNeighbors
+from typing import List
 
 app = FastAPI()
 #uvicorn main:app --reload
@@ -262,3 +267,48 @@ def get_director(nombre:str=''):
       
     return respuesta
     
+@app.get("/recomendaciones")
+def get_recomendacion(titulo:str):
+
+    movies=pd.read_csv("datasets/movies_limpio.csv",sep=',',encoding='UTF-8')
+    
+    #titulos=movies.loc[:,movies['id_orig','original_title']]
+    titulos=movies['original_title']
+    
+    df_titulos=pd.DataFrame(titulos)
+    df_titulos
+        
+    X = movies.drop(columns=['original_title','original_language','release_date'])
+    
+    X['return']=X['return'].fillna(0)
+    X.replace([np.inf, -np.inf], np.nan, inplace=True)
+    X['return']=X['return'].fillna(0)
+    ##print(X.isna().sum())
+    print(X['return'].max())
+    model = NearestNeighbors(metric='cosine', algorithm='auto')#'brute')
+    model.fit(X)
+    #movie_index=titulo(titulo,movies)
+    movie_index = movies.loc[movies['original_title'].apply(lambda x: x.lower()) == titulo.lower()]
+    print("movie_index::",movie_index)
+    print(movies.columns)
+    
+    if movie_index.empty:
+        indice=-1
+    else :
+        indice=movie_index['id_orig'].values[0]
+    
+    distances, indices = model.kneighbors(X.iloc[indice, :].values.reshape(1, -1), n_neighbors=6)
+      
+    recomendaciones =[]
+    for i in range(1, len(distances.flatten())):
+        recomendacion = {
+        "Recomendación": i,
+        "Título": df_titulos.iloc[indices.flatten()[i]]['original_title'],
+        "Distancia": distances.flatten()[i]
+        }
+        recomendaciones.append(recomendacion)
+
+    # Convertir la lista de recomendaciones a un JSON
+    mensaje_json = recomendaciones#json.dumps(recomendaciones)#, ensure_ascii=False, indent=4)
+        
+    return mensaje_json
