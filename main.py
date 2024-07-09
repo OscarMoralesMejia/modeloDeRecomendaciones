@@ -221,7 +221,7 @@ def get_actor(nombre:str=''):
             parte3="cantidad de filmaciones, el mismo ha conseguido un retorno de"
             parte4="con un promedio de"
             parte5="por filmacion"
-            partes=[parte1,nombre,parte2,str(num_conteo),parte3,str(num_retorno),parte4,str(num_promedio),parte5]
+            partes=[parte1,nombre,parte2,str(num_conteo),parte3,str(round(num_retorno)),parte4,str(round(num_promedio)),parte5]
             respuesta = " ".join(partes)
         else:
             return "El actor no esta en mi base de datos"
