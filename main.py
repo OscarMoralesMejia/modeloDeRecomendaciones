@@ -204,6 +204,8 @@ def get_actor(nombre:str=''):
             num_conteo=conteo['original_title'].values[0]
             
             num_retorno=0
+            df_join_interno['return'] = df_join_interno['return'].replace([np.inf, -np.inf], 0)
+            df_join_interno['return']=df_join_interno['return'].fillna(0)
             suma_retorno = df_join_interno.groupby('cast_name')['return'].sum().reset_index()
             retorno=suma_retorno.loc[suma_retorno['cast_name']==nombre]
             num_retorno=retorno['return'].values[0]
