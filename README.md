@@ -7,6 +7,7 @@
 4. [EDA](#eda)
 5. [Modelo de recomendación](#modelo-de-recomendaciones)
 6. [Conclusiones](#conclusiones)
+7. [Recursos](#video-sobre-api)
 
 
 
@@ -84,6 +85,19 @@ El formato parquet no es dificil de manejar y ayuda mucho a usar los recursos de
 El Deployar un MVP puede ser muy rapido si se tiene el proyecto armado en github.
 La limpieza de nulos es fundamental
 
-### Autor
-Oscar Morales Mejía 
+# Video sobre api
+Realicé un video sobre la api para explicar el contenido de la api.
+[video sobre la API](https://youtu.be/4jUjCi9f2qc)
+
+# Deploy de api
+La api se puede consultar en [render](https://modelo-de-recomendaciones-tizj.onrender.com/docs)
+
+# Autor
+Si existiera alguna duda me pueden contactar en el siguiente correo.
+
 oscar.moralesm@hotmail.com
+Ing. Oscar Morales 
+
+![github](img\gh-ico.ico)
+[omm](https://github.com/OscarMoralesMejia)
+
