@@ -98,6 +98,4 @@ Si existiera alguna duda me pueden contactar en el siguiente correo.
 oscar.moralesm@hotmail.com
 Ing. Oscar Morales 
 
-![github](img/gh-ico.ico)
-[omm](https://github.com/OscarMoralesMejia)
 
